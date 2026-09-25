@@ -1,12 +1,12 @@
 {
-	"name": "df_pagos",
+	"name": "df_calificaciones",
 	"properties": {
 		"type": "MappingDataFlow",
 		"typeProperties": {
 			"sources": [
 				{
 					"dataset": {
-						"referenceName": "pagos_csv",
+						"referenceName": "calificaciones_csv",
 						"type": "DatasetReference"
 					},
 					"name": "source1"
@@ -15,7 +15,7 @@
 			"sinks": [
 				{
 					"dataset": {
-						"referenceName": "pagos_sql",
+						"referenceName": "calificaciones_sql",
 						"type": "DatasetReference"
 					},
 					"name": "sink1"
@@ -31,32 +31,30 @@
 			],
 			"scriptLines": [
 				"source(output(",
-				"          pago_id as string,",
+				"          calificacion_id as string,",
 				"          pedido_id as string,",
-				"          fecha_pago as string,",
-				"          metodo_pago as string,",
-				"          estado_pago as string,",
-				"          monto_pagado as string",
+				"          cliente_id as string,",
+				"          fecha_calificacion as string,",
+				"          puntuacion as string,",
+				"          comentario as string",
 				"     ),",
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     ignoreNoFilesFound: false) ~> source1",
-				"source1 derive(metodo_pago = iif(metodo_pago == 'Wallet', 'Billetera móvil', initCap(trim(metodo_pago))),",
-				"          estado_pago = iif(isNull(estado_pago), 'Pendiente', initCap(trim(estado_pago))),",
-				"          monto = monto_pagado,",
-				"          monto_pagado = toDecimal(monto_pagado, 10, 2),",
-				"          fecha_pago = toDate(fecha_pago)) ~> derivedColumn1",
-				"derivedColumn1 split(!isNull(pago_id) && !isNull(pedido_id) && toDecimal(monto_pagado, 10, 2) >= 0,",
+				"source1 derive(fecha_calificacion = toDate(fecha_calificacion),",
+				"          puntuacion = toInteger(puntuacion),",
+				"          comentario = iif(isNull(comentario), 'Sin comentario', trim(comentario))) ~> derivedColumn1",
+				"derivedColumn1 split(!isNull(calificacion_id) && !isNull(pedido_id) && toInteger(puntuacion) >= 1 && toInteger(puntuacion) <= 5,",
 				"     disjoint: false) ~> split1@(validos, rechazados)",
 				"split1@validos sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
-				"          pago_id as string,",
+				"          calificacion_id as string,",
 				"          pedido_id as string,",
-				"          fecha_pago as timestamp,",
-				"          metodo_pago as string,",
-				"          monto as decimal(10,2),",
-				"          estado_pago as string",
+				"          cliente_id as string,",
+				"          fecha_calificacion as date,",
+				"          puntuacion as integer,",
+				"          comentario as string",
 				"     ),",
 				"     deletable:false,",
 				"     insertable:true,",
@@ -67,12 +65,12 @@
 				"     skipDuplicateMapOutputs: true,",
 				"     errorHandlingOption: 'stopOnFirstError',",
 				"     mapColumn(",
-				"          pago_id,",
+				"          calificacion_id,",
 				"          pedido_id,",
-				"          fecha_pago,",
-				"          metodo_pago,",
-				"          monto = monto_pagado,",
-				"          estado_pago",
+				"          cliente_id,",
+				"          fecha_calificacion,",
+				"          puntuacion,",
+				"          comentario",
 				"     )) ~> sink1"
 			]
 		}
