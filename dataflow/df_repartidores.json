@@ -15,7 +15,7 @@
 			"sinks": [
 				{
 					"dataset": {
-						"referenceName": "repartidores",
+						"referenceName": "repartidores_sql",
 						"type": "DatasetReference"
 					},
 					"name": "sink1"

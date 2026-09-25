@@ -1,5 +1,5 @@
 {
-	"name": "repartidores",
+	"name": "repartidores_sql",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "sql_delivery",
