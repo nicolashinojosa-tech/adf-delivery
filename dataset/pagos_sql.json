@@ -21,21 +21,23 @@
 			},
 			{
 				"name": "fecha_pago",
-				"type": "date"
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
 			},
 			{
 				"name": "metodo_pago",
 				"type": "nvarchar"
 			},
 			{
-				"name": "estado_pago",
-				"type": "nvarchar"
+				"name": "monto",
+				"type": "decimal",
+				"precision": 10,
+				"scale": 2
 			},
 			{
-				"name": "monto_pagado",
-				"type": "decimal",
-				"precision": 12,
-				"scale": 2
+				"name": "estado_pago",
+				"type": "nvarchar"
 			}
 		],
 		"typeProperties": {
