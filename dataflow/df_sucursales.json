@@ -1,0 +1,84 @@
+{
+	"name": "df_sucursales",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "sucursales_csv",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "sucursales_sql",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "split1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          sucursal_id as string,",
+				"          restaurante_id as string,",
+				"          nombre_sucursal as string,",
+				"          ciudad as string,",
+				"          zona as string,",
+				"          direccion as string,",
+				"          capacidad_mesas as string,",
+				"          tiene_delivery as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> source1",
+				"source1 derive(ciudad = trim(ciudad),",
+				"          direccion = iif(isNull(direccion), 'Sin dirección registrada', trim(direccion)),",
+				"          capacidad_mesas = toInteger(capacidad_mesas)) ~> derivedColumn1",
+				"derivedColumn1 split(!isNull(sucursal_id) && !isNull(capacidad_mesas) && capacidad_mesas > 0,",
+				"     disjoint: false) ~> split1@(validos, rechazados)",
+				"split1@validos sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          sucursal_id as string,",
+				"          restaurante_id as string,",
+				"          nombre_sucursal as string,",
+				"          ciudad as string,",
+				"          zona as string,",
+				"          direccion as string,",
+				"          capacidad_mesas as integer,",
+				"          tiene_delivery as string",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          sucursal_id,",
+				"          restaurante_id,",
+				"          nombre_sucursal,",
+				"          ciudad,",
+				"          zona,",
+				"          direccion,",
+				"          capacidad_mesas,",
+				"          tiene_delivery",
+				"     )) ~> sink1"
+			]
+		}
+	}
+}
