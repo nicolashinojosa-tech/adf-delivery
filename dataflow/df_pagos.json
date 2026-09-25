@@ -12,23 +12,8 @@
 					"name": "source1"
 				}
 			],
-			"sinks": [
-				{
-					"dataset": {
-						"referenceName": "pagos_sql",
-						"type": "DatasetReference"
-					},
-					"name": "sink1"
-				}
-			],
-			"transformations": [
-				{
-					"name": "derivedColumn1"
-				},
-				{
-					"name": "derivedColumn2"
-				}
-			],
+			"sinks": [],
+			"transformations": [],
 			"scriptLines": [
 				"source(output(",
 				"          pago_id as string,",
@@ -40,38 +25,7 @@
 				"     ),",
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
-				"     ignoreNoFilesFound: false) ~> source1",
-				"source1 derive(metodo_pago = lower(trim(metodo_pago)),",
-				"          estado_pago = lower(trim(estado_pago)),",
-				"          fecha_pago = trim(fecha_pago)) ~> derivedColumn1",
-				"derivedColumn1 derive(fecha_pago = iif(instr(fecha_pago,\"/\")>0,toDate(fecha_pago,\"dd/MM/yyyy\"),toDate(fecha_pago,\"yyyy-MM-dd\")),",
-				"          monto_pagado = toDecimal(monto_pagado)) ~> derivedColumn2",
-				"derivedColumn2 sink(allowSchemaDrift: true,",
-				"     validateSchema: false,",
-				"     input(",
-				"          pago_id as string,",
-				"          pedido_id as string,",
-				"          fecha_pago as date,",
-				"          metodo_pago as string,",
-				"          estado_pago as string,",
-				"          monto_pagado as decimal(12,2)",
-				"     ),",
-				"     deletable:false,",
-				"     insertable:true,",
-				"     updateable:false,",
-				"     upsertable:false,",
-				"     format: 'table',",
-				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true,",
-				"     errorHandlingOption: 'stopOnFirstError',",
-				"     mapColumn(",
-				"          pago_id,",
-				"          pedido_id,",
-				"          fecha_pago,",
-				"          metodo_pago,",
-				"          estado_pago,",
-				"          monto_pagado",
-				"     )) ~> sink1"
+				"     ignoreNoFilesFound: false) ~> source1"
 			]
 		}
 	}
